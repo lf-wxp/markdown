@@ -1,4 +1,5 @@
-- [Clipping](./clipping/index.md)   - [三体三部曲](./clipping/三体三部曲.md)
+- [Clipping](./clipping/index.md) 
+  - [三体三部曲](./clipping/三体三部曲.md)
   - [开放的智力：知乎采铜自选集](./clipping/开放的智力：知乎采铜自选集.md)
   - [人生的意义牛津通识读本](./clipping/人生的意义牛津通识读本.md)
   - [看见](./clipping/看见.md)
@@ -20,3 +21,4 @@
   - [万万没想到：用理工科思维理解世界](./clipping/万万没想到：用理工科思维理解世界.md)
   - [薛兆丰经济学讲义](./clipping/薛兆丰经济学讲义.md)
   - [唐史并不如烟系列](./clipping/唐史并不如烟系列.md)
+  - [倦怠社会](./clipping/倦怠社会.md)
