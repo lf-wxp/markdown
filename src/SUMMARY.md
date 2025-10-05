@@ -2,7 +2,12 @@
 
 [Introduction](./README.md)
 
-- [philosophy](./philosophy/index.md)
+- [English](./english/index.md)
+  - [Phonetics](./english/phonetics.md)
+  - [Analysis](./english/analysis.md)
+
+
+- [Philosophy](./philosophy/index.md)
   - [西方哲学史](./philosophy/西方哲学史.md)
 
 - [Rust](./rust/index.md)
