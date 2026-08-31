@@ -29,6 +29,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # 尝试自动启用 Pages（enablement: true）。
+      # 若仓库尚未开启 Pages，deploy 阶段会报
+      #   "Failed to create deployment (status: 404)"
+      # 这一步能免去手动开关；无权限时不阻断构建，改为手动设置：
+      #   Settings → Pages → Build and deployment → Source → GitHub Actions
+      - name: Configure Pages
+        id: pages
+        continue-on-error: true
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
       # 缓存 cargo 产物：xtask 编译结果与已安装的工具二进制
       # （pagefind Extended 需源码编译，缓存命中可省 2-4 分钟）
       - name: Cache cargo
