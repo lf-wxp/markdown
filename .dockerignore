@@ -1,0 +1,20 @@
+# 构建产物与缓存，不应进入构建上下文
+target/
+book/
+
+# 版本控制与编辑器
+.git/
+.gitignore
+.DS_Store
+.playwright-mcp/
+
+# 文档与 CI 配置（构建镜像不需要）
+README.md
+LICENSE
+Dockerfile
+.dockerignore
+docker-compose.yml
+
+# Makefile.toml 仅本地使用，镜像内直接调用 xtask/mdbook
+Makefile.toml
+.cargo/

@@ -1,16 +1,21 @@
 # Kindle什么值得读TOP100 
-Author: `Kindle 中国` 
+
+Author: **Kindle 中国**
+<div class="clipping-meta"><span data-pagefind-filter="分类">书单</span><span data-pagefind-filter="标签">书单</span><span data-pagefind-filter="作者">Kindle 中国</span></div>
+
 > &emsp; 
 > 你我生而为人，你我孤寂无依，可就任斜阳孤影叹伶仃，不如随心，随性？！
 > 
 > <p align="right"> 2017/03/17 20:52:18 </p>
 > &emsp;
-> &emsp; 
+
+> &emsp; 
 > 田青说:没有欲望和遮掩的快乐，是真正的快乐；能坦坦然然活着和死去的自由，是真正的自由。
 > 
 > <p align="right"> 2017/03/19 11:06:24 </p>
 > &emsp;
-> &emsp; 
+
+> &emsp; 
 > 死亡虽是我们每个人的宿命，但看待死亡的视角，却可以让人们获得拯救。
 > 
 > <p align="right"> 2017/03/19 11:47:29 </p>

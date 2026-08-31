@@ -2,35 +2,51 @@
 
 [Introduction](./README.md)
 
-- [English](./english/index.md)
-  - [Phonetics](./english/phonetics.md)
-  - [Analysis](./english/analysis.md)
+---
 
+# English
+
+- [English](./english/index.md)
+  - [英语发音规则](./english/phonetics.md)
+  - [句子分析](./english/analysis.md)
+
+# Philosophy
 
 - [Philosophy](./philosophy/index.md)
-  - [西方哲学史](./philosophy/西方哲学史.md)
+  - [导论](./philosophy/导论.md)
+  - [苏格拉底的问题](./philosophy/苏格拉底的问题.md)
+  - [柏拉图的理念论](./philosophy/柏拉图的理念论.md)
+  - [亚里士多德的形而上学](./philosophy/亚里士多德的形而上学.md)
+  - [信仰的时代](./philosophy/信仰的时代.md)
+  - [文艺复兴和宗教改革](./philosophy/文艺复兴和宗教改革.md)
+  - [主体性的觉醒](./philosophy/主体性的觉醒.md)
+  - [大陆唯理论](./philosophy/大陆唯理论.md)
+
+# Rust
 
 - [Rust](./rust/index.md)
-  - [closure](./rust/closure.md)
-  - [concept](./rust/concept.md)
-  - [deepInType](./rust/deepInType.md)
-  - [format格式化参数](./rust/format格式化参数.md)
-  - [iterator](./rust/iterator.md)
-  - [lifetime](./rust/lifetime.md)
-  - [pin与unpin](./rust/pin与unpin.md)
-  - [ref和&](./rust/ref和&.md)
-  - [tips](./rust/tips.md)
-  - [trait对象](./rust/trait对象.md)
+  - [规则](./rust/concept.md)
   - [原生数据类型](./rust/原生数据类型.md)
-  - [多线程](./rust/多线程.md)
-  - [所有权](./rust/所有权.md)
-  - [数据类型](./rust/数据类型.md)
-  - [智能指针](./rust/智能指针.md)
-  - [泛型](./rust/泛型.md)
+  - [类型转换](./rust/类型转换.md)
   - [自定义类型](./rust/自定义类型.md)
+  - [所有权](./rust/所有权.md)
+  - [生命周期](./rust/lifetime.md)
+  - [泛型](./rust/泛型.md)
+  - [trait 与 trait对象](./rust/trait对象.md)
+  - [newtype](./rust/deepInType.md)
+  - [闭包](./rust/closure.md)
+  - [iterator](./rust/iterator.md)
+  - [智能指针](./rust/智能指针.md)
   - [裸指针](./rust/裸指针.md)
+  - [ref 和 &](./rust/ref和&.md)
+  - [Pin 与 Unpin](./rust/pin与unpin.md)
+  - [多线程](./rust/多线程.md)
+  - [format 格式化参数](./rust/format格式化参数.md)
+  - [Tips](./rust/tips.md)
 
-- [Clipping](./clipping/index.md) 
+# Clipping
+
+- [Clipping](./clipping/index.md)
   - [三体三部曲](./clipping/三体三部曲.md)
   - [开放的智力：知乎采铜自选集](./clipping/开放的智力：知乎采铜自选集.md)
   - [人生的意义牛津通识读本](./clipping/人生的意义牛津通识读本.md)

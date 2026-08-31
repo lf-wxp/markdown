@@ -1,30 +1,50 @@
+# 句子分析
+
+每条为一个句子的结构分析：引用为原句，下方列出解析要点。
+
 <!-- toc -->
-####  However, by coming into existence one does suffer quite serious harms that could not have befallen one <u>had one not come into existence</u>.
+
+### 虚拟语气倒装：had one not
+
+> However, by coming into existence one does suffer quite serious harms that could not have befallen one <u>had one not come into existence</u>.
 
 - "had one not come into existence" 这部分是一个虚拟语气的倒装句，表示对过去事实的假设。
 
---- 
-#### He need not mean literally that (if he were to die)<u>were he to die</u> he would exist in some better state.
+---
 
-- 原句：If I were you, I would accept the offer. 倒装：Were I you, I would accept the offer. 
-- 原句：If you had told me, I could have helped you. 倒装：Had you told me, I could have helped you.
-- 原句：If it should rain, we will stay at home. 倒装：Should it rain, we will stay at home
---- 
+### 虚拟条件倒装：were / had / should
 
-#### Nor is the harm produced by the creation of a child usually restricted to that child.
+> He need not mean literally that (if he were to die)<u>were he to die</u> he would exist in some better state.
 
- - 正常话序The harm produced by the creation of a child is not usually restricted to that child.
+- **原句**：If I were you, I would accept the offer.
+- **倒装**：Were I you, I would accept the offer.
+- **原句**：If you had told me, I could have helped you.
+- **倒装**：Had you told me, I could have helped you.
+- **原句**：If it should rain, we will stay at home.
+- **倒装**：Should it rain, we will stay at home
 
- - 原句：I don't like apples. I also don't like oranges. 倒装：I don't like apples. Nor do I like oranges.
+---
 
-- 原句：I am a teacher. He is a teacher too. 倒装：I am a teacher. So is he.
+### 否定前置倒装：Nor
 
-- 原句：Only after he had finished his homework, he could watch TV. 倒装：Only after he had finished his homework could he watch TV. 
+> Nor is the harm produced by the creation of a child usually restricted to that child.
 
+ - **正常语序**：The harm produced by the creation of a child is not usually restricted to that child.
 
---- 
+ - **原句**：I don't like apples. I also don't like oranges.
+ - **倒装**：I don't like apples. Nor do I like oranges.
 
-#### Sound though I believe my argument to be, I cannot but hope that i am wrong.
+- **原句**：I am a teacher. He is a teacher too.
+- **倒装**：I am a teacher. So is he.
+
+- **原句**：Only after he had finished his homework, he could watch TV.
+- **倒装**：Only after he had finished his homework could he watch TV.
+
+---
+
+### though 引导让步倒装
+
+> Sound though I believe my argument to be, I cannot but hope that i am wrong.
 
 尽管我相信我的论点是正确的，但我还是希望自己是错的。
 "though" 作为让步状语，引导了一个让步状语从句，使用了倒装句式
@@ -32,38 +52,50 @@
 "I cannot but" 是一个固定搭配，表示 "我只能" 或 "我不得不”。
 I cannot but admire her courage. 我不得不钦佩她的勇气。
 
---- 
+---
 
-#### show why life is bad irrespective of which of views one adopts.
+### irrespective of 作状语
+
+> show why life is bad irrespective of which of views one adopts.
 状语：无论采纳哪种观点 (irrespective of which of views one adopts)
 
 ---
 
-#### so long as the negative states are not of sufficient intensity to undo the pleasure entirely.
+### of 表从属关系
+
+> so long as the negative states are not of sufficient intensity to undo the pleasure entirely.
 只要负面状态的强度不足以完全抵消快乐.
 "of" 在这个短语中起到了表示从属关系的作用，表示负面状态具有的强度.
 
---- 
+---
 
-#### Abraham Maslow writes disapprovingly of our perpetual discontent.
+### of 表「关于」
+
+> Abraham Maslow writes disapprovingly of our perpetual discontent.
 "of" 在这里表示 "关于" 的意思。类似的表达方式还有 "speak of"（谈论）、"think of"（想到）等，都是用 "of" 来表示主题或内容
 
 ---
 
-#### One need not reject， as Arthur Schopenhauer does, the independent existence of happiness to accept his view that suffering is endemic to and pervasive in life
+### endemic to 搭配
+
+> One need not reject， as Arthur Schopenhauer does, the independent existence of happiness to accept his view that suffering is endemic to and pervasive in life
 
 就像阿瑟·叔本华所做的那样，人们不需要拒绝幸福的独立存在，就可以接受他的观点，即痛苦是生活中的普遍现象。
  "endemic to" 是一个固定搭配，表示某种事物在特定环境、地区或群体中普遍存在，"endemic to" 后面需要跟一个名词，表示这种普遍存在的范围或对象。
 
 ---
 
-#### thus the striving fulfils a desire on the way to fulfilling another desire
+### to 作介词接动名词
+
+> thus the striving fulfils a desire on the way to fulfilling another desire
 
 To 是介词， 所以用动名词
 
---- 
+---
 
-#### A suitable analogy is that of a teacher marking a student’s essay or exam
+### that of 引出类比
+
+> A suitable analogy is that of a teacher marking a student’s essay or exam
 这里的 "that of" 是一个常见的表达，用来引出一个比较或类比的对象。"that" 在这里是一个代词，指代前面提到的 "analogy"（类比），而 "of" 则用来引出这个类比的具体内容，即 "a teacher marking a student’s essay or exam"。
 
 - A suitable analogy is a teacher marking a student's essay or exam.
@@ -71,74 +103,92 @@ To 是介词， 所以用动名词
 
 ---
 
+### need 作情态动词
 
-#### I have not argued, nor need I have argued
+> I have not argued, nor need I have argued
 "need" 这里作为情态动词,这种用法相对正式，通常出现在书面语境中
 
 ---
 
+### Such is … that 强调
 
-#### Such is the strength of Pollyannaism, that the foregoing sort of pessimism is often dismissed as self-pitying whining of existential weaklings.
+> Such is the strength of Pollyannaism, that the foregoing sort of pessimism is often dismissed as self-pitying whining of existential weaklings.
 "Such is...that..." 的结构用于强调主语的特点或性质，并描述其结果或影响。在这种结构中，"such" 通常用于修饰名词短语。
 
---- 
+---
 
-#### The news is so shocking that everyone is talking about it.
+### so … that 强调程度
+
+> The news is so shocking that everyone is talking about it.
 "so...that..." 的结构通常用于强调程度，并描述其结果或影响。在这种结构中，"so" 用于修饰形容词或副词。
 
 ---
 
-#### non-procreation need not come at the cost of frustrating coital interests(and a fortiori non-coital sexual interests)
+### frustrating 作现在分词
+
+> non-procreation need not come at the cost of frustrating coital interests(and a fortiori non-coital sexual interests)
 不生育并不一定要以阻碍性交兴趣为代价（更不用说阻碍非性交的性兴趣了）
 frustrating是做为动词的现在分词
 
---- 
+---
 
-#### The additional effort that that care takes cannot begin to outweigh the harm of coming into existence, and thus we certainly cannot condone that baby-making that is a mere consequence of coitus.
+### that that 连用
+
+> The additional effort that that care takes cannot begin to outweigh the harm of coming into existence, and thus we certainly cannot condone that baby-making that is a mere consequence of coitus.
 额外的护理付出无法抵消生命诞生带来的伤害，因此我们当然不能宽恕那些仅仅是性交结果的生育行为。
 
 ---
 
-#### To the  extent that these goods could be obtained without  producing children of one's own.
+### To the extent that
+
+> To the  extent that these goods could be obtained without  producing children of one's own.
 "To the extent that" 是一个常用的短语，用来表示"在...程度上"或者"在...范围内"。
 
 ---
 
+### that of 指代前文
 
-#### Now the problem with this standard is that of differentiating between disagreements that are actually unreasonable and those that are only perceived to be so 
+> Now the problem with this standard is that of differentiating between disagreements that are actually unreasonable and those that are only perceived to be so
 "that of" 是一个常见的表达，用来引出一个比较或类比的对象。"that" 在这里是一个代词，指代前面提到的 "problem"（问题），而 "of" 则用来引出这个问题的具体内容
 Now the problem with this standard is that it differentiates between disagreements that are actually unreasonable and those that are only perceived to be so
 
 ---
 
-#### Instead the reproductive view of sexual ethics maintains that a sexual act must be of the reproductive sort
+### be of the … sort
+
+> Instead the reproductive view of sexual ethics maintains that a sexual act must be of the reproductive sort
 "be of the reproductive sort" 是一个表达，用来描述性行为的性质。
 The workshop will be of the practical sort, teaching attendees how to fix common household problems.
 
 ---
 
-#### The parents conceive and bring to term a child that they merely hope will be a suitable match. Either way they will love and rear it.
+### bring / carry to term
+
+> The parents conceive and bring to term a child that they merely hope will be a suitable match. Either way they will love and rear it.
 "bring to term" 确实不是一个常用的固定短语。一个更常用的短语是 "carry to term"，表示将怀孕进行到足月，即成功地将孩子从怀孕到出生的整个过程。在这个句子中，"bring to term" 的意思与 "carry to term" 类似
 
 ---
 
+### to the ends of
 
-#### The clone is treated as a mere means to the ends of the being cloned
+> The clone is treated as a mere means to the ends of the being cloned
 克隆体被视为仅仅是为了实现被克隆者目标的手段
 "to the ends of" 是一个介词短语，表示 "为了...的目的" 或 "为了实现...的目标""ends" 在这里是一个名词，表示 "目的" 或 "目标"。
 
 ---
 
+### prior to 与 as 作介词
 
-#### Thus we cannot speak of a new organism as having come into existence prior to conception  .
+> Thus we cannot speak of a new organism as having come into existence prior to conception  .
 因此，在受孕之前，我们不能说一个新生命体已经诞生。
 prior to 介词短语， 在……之前。
 as 介词，当作
 
 ---
 
+### more of 表数量
 
-#### Thus if some merely conscious being wants more of the same pleasurable experiences it just had, and if that desire and the interest to which it gives rise is morally considerable, this being may have an interest, even if only a weak one, in continue life.
+> Thus if some merely conscious being wants more of the same pleasurable experiences it just had, and if that desire and the interest to which it gives rise is morally considerable, this being may have an interest, even if only a weak one, in continue life.
 "of" 在这里起到了连接 "more" 和 "the same pleasurable experiences" 的作用，表示数量关系。
 "more" 是一个表示数量的词，用于表达某事物的数量比另一事物多。当 "more" 修饰一个名词或名词短语时，需要使用 "of" 来建立它们之间的关系。例如：
 * more of the cake (蛋糕的更多部分)
@@ -146,12 +196,16 @@ as 介词，当作
 
 ---
 
-#### These are principles that it would be rational to adopt were we truly impartial
+### were 引导虚拟条件
+
+> These are principles that it would be rational to adopt were we truly impartial
 if we were truly impartial， 表示假设
 
 ---
 
-#### is of
+### is of 的四类含义
+
+> is of
 - 表示类别或种类：例如 "This book is of the mystery genre."（这本书属于悬疑类别。）在这个例子中，"is of" 用来表示这本书属于某个特定的类别或种类。
 - 表示来源或材料：例如 "The necklace is of gold."（这条项链是金制的。）在这个例子中，"is of" 用来表示项链是由什么材料制成的。
 - 表示关系或相关性：例如 "The lecture is of great importance."（这个讲座非常重要。）在这个例子中，"is of" 用来表示讲座和重要性之间的关系。
@@ -159,8 +213,9 @@ if we were truly impartial， 表示假设
 
 ---
 
+### put to death 与 know of
 
-#### For example , no religion I known of currently endorses, as a practical matter, putting to death one’s rebellious son, the biblical commandment to do so notwithstanding
+> For example , no religion I known of currently endorses, as a practical matter, putting to death one’s rebellious son, the biblical commandment to do so notwithstanding
 
 "put to death" 这个短语后面，可以接一个宾语来表示被处死的对象
 
@@ -168,12 +223,15 @@ if we were truly impartial， 表示假设
 
 ---
 
+### as … as 让步结构
 
-#### Moreover, as resistant as people are to the philanthropic argument, they would be still more resistant to the misanthropic one
+> Moreover, as resistant as people are to the philanthropic argument, they would be still more resistant to the misanthropic one
 
 ---
 
-#### Often, in the repose of my mid-day, there reaches my ears a confused tintinnabulum from without。
+### there 作虚拟主语
+
+> Often, in the repose of my mid-day, there reaches my ears a confused tintinnabulum from without。
 
 "there" 本身是一个副词，但在英语中，它也可以作为一个虚拟主语（dummy subject）用在句子中。这种结构通常被称为 "there be" 结构。
 "there" 起到了虚拟主语的作用，表示存在某种情况（即钟声抵达作者的耳朵）。"a confused tintinnabulum" 是真正的主语。
@@ -182,14 +240,17 @@ if we were truly impartial， 表示假设
 
 ---
 
+### save for 表例外
 
-#### empty save for the trash left by the crowd
+> empty save for the trash left by the crowd
 "save for" 是一个表示例外的介词短语，意思是 "除了"
 save   prep. conj 除了
 
 ---
 
-#### In front of the metal monster stood the slim figure of a young woman.
+### 地点状语前置全倒装
+
+> In front of the metal monster stood the slim figure of a young woman.
 倒装结构来强调
 
 You’re making being nice a thankless task.
@@ -199,37 +260,48 @@ You’re making being nice a thankless task.
 
 ---
 
-#### a bell that tolled for he knew not whom
+### knew not 古雅否定
+
+> a bell that tolled for he knew not whom
 knew not（即“did not know”，是较为古雅的表达方式）
 a bell that tolled for whom he didn't know
 
 ---
 
+### 裸不定式 bare infinitive
 
-#### All I can do is (to) counsel you against leaving with her
+> All I can do is (to) counsel you against leaving with her
 “bare infinitive”（裸不定式）
 All we need to do is wait.
 The best thing you can do is apologize.
 
 ---
 
-#### I waited outside the door for about the time it took to smoke a cigarette
+### 宾语从句作同位语
+
+> I waited outside the door for about the time it took to smoke a cigarette
 "it took to smoke a cigarette" 是一个宾语从句，作为 "the time" 的同位语，说明具体是什么时间
 
 ---
 
-#### Unwrapping the coats revealed a large pot, the fermented cabbage and pork dumplings inside still steaming hot
+### 动名词短语作主语
+
+> Unwrapping the coats revealed a large pot, the fermented cabbage and pork dumplings inside still steaming hot
 主语：Unwrapping the coats（动名词短语作主语）
 名词短语（作为宾语补足语） the fermented cabbage and pork dumplings inside still steaming hot这个名词短语进一步描述了“a large pot”中的内容及其状态。
 
 ---
 
-#### Ye loved to watch them sleep, their even breathing the only sound in the room
+### 省略系动词的独立主格
+
+> Ye loved to watch them sleep, their even breathing the only sound in the room
 这个状语从句实际上是一个省略了系动词“was”的句子，完整的表达应该是：“Their even breathing was the only sound in the room.”
 
 ---
 
-#### His eyes could easily read deep into the heart of everyone aboard the ship, be they captain or sailor.
+### be they … 让步从句
+
+> His eyes could easily read deep into the heart of everyone aboard the ship, be they captain or sailor.
 
 - "be they captain or sailor" 是一种让步状语从句。
 - "be they" 是一种古英语或正式英语中的表达方式，用来表示无论什么情况
@@ -237,22 +309,31 @@ The best thing you can do is apologize.
 
 ---
 
-#### Shi Qiang had grown excited while speaking and seemed a little put out at Luo Ji's interruption.
+### put out 搭配
+
+> Shi Qiang had grown excited while speaking and seemed a little put out at Luo Ji's interruption.
+
 ---
 
-#### The defeat of the strong at the hands of the weak made him a hero
+### at the hands of
+
+> The defeat of the strong at the hands of the weak made him a hero
 强者在弱者手中的失败使他成为英雄。
 
 ---
 
-#### You begin to use the new words with scarcely any consciousness of what you are doing
+### scarcely 修饰程度
+
+> You begin to use the new words with scarcely any consciousness of what you are doing
 副词 "scarcely" 用来修饰 "any consciousness" 这个短语，强调了 "consciousness" 的程度
 Just one more step to complete the process.
     * "Just" 修饰 "one more step"，表达完成过程只需再迈出一步。
 
 ---
 
-#### Then came the sound of the tub being filled
+### then 引起全倒装
+
+> Then came the sound of the tub being filled
 
 初始观察
 
@@ -651,10 +732,12 @@ Sentence:
 句意：接着，传来了浴缸被注满的声音。
 
 这种倒装结构使句子更加生动和文学化，强调了“then”之后发生的事件，同时平衡了较长的主语。
- 
+
 ---
 
-#### I am late, aren’t I
+### 反义疑问句
+
+> I am late, aren’t I
 
 初始观察
 
@@ -891,10 +974,11 @@ Sentence:
 
 ---
 
-#### I’d love to go to china ~ So would I
+### So would I 附和倒装
+
+> I’d love to go to china ~ So would I
 
 是的，“So would I” 是对 “I’d love to go to China” 的 完全正确且地道 的回答！以下是详细分析：
-
 
 语法解析：
 
@@ -907,7 +991,6 @@ Sentence:
    · So + 助动词（would） + 主语（I）
    · 表示 “我也一样”，且严格遵循原句的 助动词（would） 和 肯定语义。
 
-
 为什么正确？
 
 · 助动词一致性：回应必须复用原句的助动词（此处是 would）。
@@ -918,7 +1001,6 @@ Sentence:
   A: I can swim.
   B: So can I.
 · 语义匹配：原句表达愿望（would love to），回应表示相同愿望。
-
 
 对比错误用法：
 
@@ -937,14 +1019,12 @@ I’d love... So would I. ❌ So do I. 助动词不匹配（would≠do）
    Same here!
    （口语中可接受，但缺少语法严谨性）
 
-
 进阶规则：否定句如何回应？
 
 若原句为否定，需用 “Neither/Nor + 助动词 + 主语”：
 
 A: I wouldn’t go there.
 B: Neither would I.
-
 
 总结：
 
@@ -962,7 +1042,9 @@ B: So will we.
 
 ---
 
-#### There's someone waiting for you .是正确的， 但是There was a noise waking me up. 就是错误的，为什么？
+### 分词作后置定语
+
+> There's someone waiting for you .是正确的， 但是There was a noise waking me up. 就是错误的，为什么？
 
 这是一个非常敏锐的语法观察！两句话表面结构相似，但核心差异在于 分词（-ing形式）与所修饰名词的逻辑关系。以下是详细解析：
 
@@ -1045,10 +1127,11 @@ B: So will we.
    · 换被动语态（I was woken up by a noise）
    · 调整分词为描述状态（a noise coming from...）
 
-
 ---
 
-#### we've got a great time.
+### have got 搭配
+
+> we've got a great time.
 
 是的，这句话存在明显问题。 以下是详细解析和修正建议：
 
@@ -1116,7 +1199,9 @@ B: So will we.
 
 ---
 
-#### There is no object in making myself conspicuous
+### in + 动名词
+
+> There is no object in making myself conspicuous
 
 这句话 "There is no object in making myself conspicuous" 是英语中一种较为正式且略带文学色彩的表达，其核心含义需要结合语境理解。以下是逐层解析：
 
@@ -1203,7 +1288,9 @@ It's futile to draw attention to oneself. 书面化 强调"徒劳"（futile）
 
 ---
 
-#### She took a real delight in picturing to me the agonies that would be endured by the various people in the village whom for some reason or other she had it in for.
+### take delight in
+
+> She took a real delight in picturing to me the agonies that would be endured by the various people in the village whom for some reason or other she had it in for.
 
 好的，这是一个非常精彩的句子，充满了情感和叙事色彩。我们来对它进行详细的语法分析。
 
@@ -1269,7 +1356,9 @@ She took a real delight in picturing to me the agonies that would be endured by 
 
 ---
 
-#### I, being made of stuff less stern, stepped into a taxi
+### 分词短语作状语
+
+> I, being made of stuff less stern, stepped into a taxi
 
 好的，这个句子非常优美，使用了典型的“独立主格结构”来提供背景信息。我们来详细分析它的语法结构。
 
@@ -1331,9 +1420,11 @@ I, being made of stuff less stern, stepped into a taxi.
 
 这个句子通过一个简单的动作（搭乘出租车）和一个深刻的原因说明（性格使然），巧妙地塑造了人物的自我形象，并暗示了与他人（可能选择步行或忍受苦难的人）的对比。其语法结构的核心是使用分词短语“being made of...”作为插入语，来表达动作背后的原因。
 
---- 
+---
 
-#### Nowhere else is our institutional introversion borne out than at the Merriam-Webster holiday parties
+### Nowhere 否定前置倒装
+
+> Nowhere else is our institutional introversion borne out than at the Merriam-Webster holiday parties
 
 好的，这是一个非常精彩的句子，它使用了复杂的语法结构来达到强调的目的。我们来一步步分析。
 
@@ -1409,3 +1500,6 @@ Nowhere else （地点状语） is （系动词，因倒装提前） our institu
 
 ---
 
+### be cracked up to be
+
+> Depth isn’t all it’s cracked up to be

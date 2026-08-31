@@ -1,0 +1,395 @@
+/* 排版增强样式
+ *
+ * 目标：在 mdBook 默认主题基础上强化内容结构感，覆盖本项目实际使用的元素：
+ *   引用块 2065 行（多为 Kindle 摘录）、无序列表 361、行内代码 225、
+ *   表格 94 行、代码块 62、H2/H3/H4 共 161、<mark> 29
+ *
+ * 所有颜色均派生自 mdBook 主题变量，随主题切换自动适配。
+ * 变量定义见 pagefind.css 中的 body 规则（--pf-muted / --pf-border）。
+ */
+
+/* ================================================================ 正文基础 */
+
+.content main {
+  /* 中文阅读行高略大更舒适 */
+  line-height: 1.8;
+}
+
+.content main > p {
+  margin: 1em 0;
+}
+
+/* 中英混排时给西文与数字留出间隙，避免拥挤 */
+.content main {
+  text-spacing-trim: space-all;
+}
+
+/* ================================================================ 标题层次 */
+
+/* H1 底部用强调色渐变条替代灰线，让页面开头有明确的视觉锚点 */
+.content h1 {
+  position: relative;
+  padding-bottom: 0.45em;
+  margin-bottom: 1.3em;
+  font-size: 2em;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+.content h1::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(
+    to right,
+    var(--pf-accent) 0,
+    var(--pf-accent) 4.5rem,
+    var(--pf-border) 4.5rem,
+    var(--pf-border) 100%
+  );
+}
+
+/* H2 用左侧粗色条 + 浅底色，比单纯下划线更有重量，
+ * 长文档（如 970 条摘录、48 个例句）里能明显切分出章节 */
+.content h2 {
+  padding: 0.3em 0.6em;
+  margin-top: 2.4em;
+  margin-bottom: 1em;
+  font-size: 1.5em;
+  font-weight: 650;
+  line-height: 1.4;
+  border-left: 5px solid var(--pf-accent);
+  border-radius: 0 4px 4px 0;
+  background-color: var(--pf-surface);
+}
+
+/* H3 用左侧细色条，与 H2 的实底块形成层级差 */
+.content h3 {
+  position: relative;
+  padding-left: 0.7em;
+  margin-top: 2em;
+  margin-bottom: 0.75em;
+  font-size: 1.22em;
+  font-weight: 650;
+  line-height: 1.45;
+}
+
+.content h3::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.12em;
+  bottom: 0.12em;
+  width: 4px;
+  border-radius: 2px;
+  background-color: var(--pf-accent);
+}
+
+/* H4 在 english/analysis.md 中用于承载例句，需清晰但不过重 */
+.content h4 {
+  margin-top: 1.6em;
+  margin-bottom: 0.6em;
+  font-size: 1.05em;
+  line-height: 1.6;
+  color: var(--fg);
+}
+
+/* 标题锚点链接：悬停时显示，不干扰阅读 */
+.content h1 a.header,
+.content h2 a.header,
+.content h3 a.header,
+.content h4 a.header {
+  text-decoration: none;
+}
+
+/* ================================================================ 列表 */
+
+.content main ul,
+.content main ol {
+  padding-left: 1.5em;
+  margin: 0.9em 0;
+}
+
+.content main li {
+  margin: 0.4em 0;
+  line-height: 1.75;
+}
+
+/* 嵌套列表收紧，避免层级过深时占用过多纵向空间 */
+.content main li > ul,
+.content main li > ol {
+  margin: 0.35em 0;
+}
+
+/* 项目符号加大加重：361 处列表是主要的结构载体，符号太小会显得松散 */
+.content main ul > li::marker {
+  color: var(--pf-accent);
+  font-size: 1.15em;
+}
+
+.content main ol > li::marker {
+  color: var(--pf-accent);
+  font-weight: 650;
+}
+
+/* ================================================================ 行内代码 */
+
+/* 行内代码（225 处）：底色 + 强调色文字，使其在中文正文里能被立刻辨识 */
+.content main :not(pre) > code {
+  padding: 0.15em 0.42em;
+  font-size: 0.88em;
+  color: var(--pf-accent-fg);
+  background-color: var(--pf-surface);
+  border: 1px solid var(--pf-border);
+  border-radius: 4px;
+  /* 长标识符（如 aarch64-unknown-linux-musl）允许换行，避免溢出 */
+  word-break: break-word;
+}
+
+/* 链接内的行内代码跟随链接色，避免两种强调色打架 */
+.content main a > code {
+  color: inherit;
+}
+
+/* ================================================================ 代码块 */
+
+/* mdBook 默认代码块与页面同底色，仅靠边框区分，视觉上非常“淡”。
+ * 这里给出明确的表面色，让 62 个代码块成为清晰的独立容器。 */
+.content main pre {
+  padding: 0;
+  margin: 1.35em 0;
+  background-color: var(--pf-surface);
+  border: 1px solid var(--pf-border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.content main pre > code {
+  display: block;
+  padding: 1em 1.1em;
+  font-size: 0.875em;
+  line-height: 1.7;
+  background: none;
+  overflow-x: auto;
+}
+
+/* 可运行代码块（29 个含 fn main 的 Rust 示例）用强调色左边框标注可交互 */
+.content main pre.playground {
+  border-left: 4px solid var(--pf-accent);
+}
+
+/* 运行/复制按钮容器留出内边距，避免贴边 */
+.content main pre > .buttons {
+  padding: 0.4em 0.55em 0 0;
+}
+
+.content main pre > .buttons button {
+  color: var(--pf-muted);
+}
+
+.content main pre > .buttons button:hover {
+  color: var(--pf-accent);
+}
+
+/* ================================================================ 引用块 */
+
+/* Kindle 摘录大量使用引用块（2065 行），设计为左侧色条 + 表面色卡片。
+ * 用统一的 --pf-surface 而非 --quote-bg：后者在多个主题下与页面背景几乎无差异。 */
+.content main blockquote {
+  padding: 0.95em 1.15em;
+  margin: 1.2em 0;
+  color: var(--fg);
+  background-color: var(--pf-surface);
+  border: none;
+  border-left: 4px solid var(--pf-accent);
+  border-radius: 0 5px 5px 0;
+}
+
+.content main blockquote > p {
+  margin: 0.4em 0;
+}
+
+.content main blockquote > p:first-child {
+  margin-top: 0;
+}
+
+.content main blockquote > p:last-child {
+  margin-bottom: 0;
+}
+
+/* 摘录时间戳：原文用 <p align="right"> 承载（413 处），弱化为脚注样式 */
+.content main blockquote p[align="right"] {
+  margin: 0.5em 0 0 0;
+  font-size: 0.78em;
+  font-variant-numeric: tabular-nums;
+  color: var(--pf-muted);
+}
+
+/* ================================================================ 表格 */
+
+.content main table {
+  display: table;
+  width: 100%;
+  margin: 1.35em 0;
+  border-collapse: collapse;
+  border: 1px solid var(--pf-border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+/* 表头用更强的表面色 + 强调色下边线，让 94 行表格数据有明确的起点 */
+.content main table thead th {
+  padding: 0.62em 0.9em;
+  font-weight: 650;
+  text-align: left;
+  background-color: var(--pf-surface-2);
+  border-bottom: 2px solid var(--pf-accent);
+}
+
+.content main table td {
+  padding: 0.58em 0.9em;
+  border-top: 1px solid var(--pf-border);
+}
+
+/* 斑马纹：长表格（phonetics.md 有 76 行）逐行对照时不易串行 */
+.content main table tbody tr:nth-child(even) {
+  background-color: var(--pf-surface);
+}
+
+.content main table tbody tr:hover {
+  background-color: var(--pf-surface-2);
+}
+
+/* 表格内的行内代码去掉边框与底色，避免单元格视觉过载 */
+.content main table :not(pre) > code {
+  padding: 0.1em 0.3em;
+  background: none;
+  border: none;
+}
+
+/* ================================================================ 强调标记 */
+
+/* <mark> 共 29 处，用于标注要点。
+ * 不用实色块（暗色主题下会压住文字），改用下半部分的色带模拟荧光笔。
+ * 底色不能用 --quote-bg：它与页面背景过于接近（light 主题下几乎不可见），
+ * 这里用主题链接色调低透明度，各主题下都能看清。 */
+.content main mark {
+  padding: 0.1em 0.15em;
+  color: var(--fg);
+  background-color: transparent;
+  background-image: linear-gradient(
+    transparent 52%,
+    color-mix(in srgb, var(--pf-accent) 38%, transparent) 52%
+  );
+}
+
+/* 加粗用强调色，让「关键结论」在长段落中跳出来 */
+.content main strong {
+  font-weight: 650;
+  color: color-mix(in srgb, var(--pf-accent-fg) 72%, var(--fg));
+}
+
+/* 表格与标题内的加粗保持本色，避免与既有强调色冲突 */
+.content main table strong,
+.content h1 strong,
+.content h2 strong,
+.content h3 strong {
+  color: inherit;
+}
+
+/* english/analysis.md 用 <u> 标注句子成分 */
+.content main u {
+  text-decoration: none;
+  border-bottom: 2px solid var(--pf-accent);
+}
+
+/* ================================================================ 分隔线 */
+
+.content main hr {
+  height: 1px;
+  margin: 2.2em 0;
+  background-color: var(--pf-border);
+  border: none;
+}
+
+/* ================================================================ 链接 */
+
+.content main a:not(.header) {
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.15em;
+}
+
+/* ================================================================ 窄屏适配 */
+
+@media (max-width: 700px) {
+  .content main {
+    line-height: 1.75;
+  }
+
+  .content h1 {
+    font-size: 1.6em;
+  }
+
+  .content h2 {
+    font-size: 1.3em;
+    margin-top: 1.8em;
+  }
+
+  .content main blockquote {
+    padding: 0.75em 0.9em;
+  }
+
+  /* 表格横向滚动而非压缩，保证可读 */
+  .content main table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+}
+
+/* ================================================================ 打印 */
+
+@media print {
+  .content main pre,
+  .content main blockquote,
+  .content main table {
+    break-inside: avoid;
+  }
+}
+
+/* ================================================================ 例句与对照 */
+
+/* english/analysis.md 的例句用引用块承载（48 处）。
+ * 这类引用块只有一行英文原句，需要比普通引用更醒目，
+ * 用略大的字号 + 左侧强调色，与下方的中文解析区分开。 */
+.content main blockquote > p:only-child {
+  font-size: 1.02em;
+}
+
+/* 分隔线用于切分例句块（analysis.md 有 47 处），
+ * 比默认样式更轻，避免视觉上过度打断 */
+.content main hr {
+  height: 0;
+  margin: 2em 0;
+  background: none;
+  border: none;
+  border-top: 1px dashed var(--pf-border);
+}
+
+/* ================================================================ 表格补强 */
+
+/* phonetics.md 的部分表格首列表头为空（源文件如此），
+ * 空单元格不应显示为塌陷的空白 */
+.content main table th:empty::after {
+  content: "\00a0";
+}
+
+/* 表格内的 <u> 标注（连读位置）需要比正文更明显 */
+.content main table u {
+  border-bottom-width: 2px;
+}

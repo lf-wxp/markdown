@@ -1,0 +1,29 @@
+services:
+  notes:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: notes:latest
+    container_name: notes
+    ports:
+      - "${NOTES_PORT:-8080}:80"
+    restart: unless-stopped
+    # 静态站点无需写权限，只放开 nginx 运行必需的临时目录
+    read_only: true
+    tmpfs:
+      - /var/cache/nginx
+      - /var/run
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1/index.html"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"

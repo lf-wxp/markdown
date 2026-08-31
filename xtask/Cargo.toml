@@ -1,0 +1,12 @@
+[package]
+name = "xtask"
+version = "0.1.0"
+edition = "2021"
+publish = false
+description = "知识库构建辅助工具：生成 SUMMARY.md"
+
+[[bin]]
+name = "xtask"
+path = "src/main.rs"
+
+[dependencies]

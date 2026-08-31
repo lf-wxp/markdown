@@ -1,9 +1,52 @@
 [book]
-authors = []
-language = "en"
-multilingual = false
+title = "Notes"
+description = "个人知识库：English / Philosophy / Rust / Kindle Clipping"
+authors = ["lf-wxp"]
+language = "zh-CN"
 src = "src"
+
+[build]
+build-dir = "book"
+create-missing = false
 
 [preprocessor.toc]
 command = "mdbook-toc"
 renderer = ["html"]
+
+[output.html]
+default-theme = "light"
+preferred-dark-theme = "navy"
+git-repository-url = "https://github.com/lf-wxp/markdown"
+edit-url-template = "https://github.com/lf-wxp/markdown/edit/main/{path}"
+# GitHub Pages 部署在子路径下（https://<user>.github.io/<repo>/）。
+# 404 页用相对路径引用 css/js，访问深层不存在的 URL 时会取不到资源，
+# site-url 使 mdBook 为 404 页生成带前缀的绝对路径。
+# 若改用自定义域名或部署到根路径，将其改为 "/"。
+site-url = "/markdown/"
+no-section-label = false
+additional-css = ["theme/pagefind.css", "theme/typography.css"]
+additional-js = ["theme/pagefind-init.js"]
+
+[output.html.fold]
+enable = true
+level = 1
+
+# 关闭「打印整本书」页：该页把全书合并成一个 HTML，
+# 会导致 Pagefind 标签计数翻倍并混入聚合噪音结果（见 Makefile.toml）
+[output.html.print]
+enable = false
+
+# mdBook 自带搜索基于 elasticlunr，按空白分词，CJK 内容完全无法建立索引
+# （实测中文索引 token 数为 0），因此禁用，改用 Pagefind（见 Makefile.toml）
+[output.html.search]
+enable = false
+
+# Rust 代码块在线运行（实测 29 个含 fn main 的代码块生成了运行按钮）
+# 这是 mdBook 内置能力，无需插件
+# 注：editable/line-numbers 需要额外的 ace 编辑器资源，mdBook 0.5 默认未内置，故不启用
+[output.html.playground]
+editable = false
+copyable = true
+copy-js = true
+runnable = true
+

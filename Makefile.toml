@@ -1,0 +1,219 @@
+# cargo-make 任务定义
+#
+# 常用命令：
+#   cargo make build     构建到 book/
+#   cargo make serve     构建后启动本地预览
+#   cargo make check     校验（CI 用，不写文件）
+#   cargo make summary   仅重新生成 SUMMARY.md
+#   cargo make setup     安装所需工具链
+#
+# 设计说明：整条链路只依赖 Rust 工具链，无 Python / Node 依赖。
+
+[config]
+default_to_workspace = false
+skip_core_tasks = true
+
+[env]
+# Pagefind 索引仅覆盖正文，排除侧边栏目录，避免每页都命中章节名造成噪音
+PAGEFIND_ROOT_SELECTOR = "main"
+# 预览端口，可用外部环境变量覆盖：SERVE_PORT=9000 cargo make serve
+SERVE_PORT = { value = "8000", condition = { env_not_set = ["SERVE_PORT"] } }
+
+# ---------------------------------------------------------------- 工具链安装
+
+[tasks.setup]
+description = "安装构建所需的全部工具（mdbook / mdbook-toc / pagefind）"
+script_runner = "@shell"
+script = '''
+set -e
+for tool in mdbook mdbook-toc; do
+  if command -v "$tool" >/dev/null 2>&1; then
+    echo "  已安装 $tool"
+  else
+    echo "  正在安装 $tool ..."
+    cargo install "$tool" --locked
+  fi
+done
+
+# pagefind 必须启用 extended feature 才具备 CJK 分词能力，
+# 否则中文搜索召回严重不足（实测「三体」「意义」返回 0 条）。
+# --version 不含 Extended 标识，只有运行时横幅有，故用临时站点探测。
+probe=$(mktemp -d)
+printf '<html><body><main>探测</main></body></html>' > "$probe/index.html"
+if command -v pagefind >/dev/null 2>&1 \
+   && pagefind --site "$probe" 2>&1 | grep -qi extended; then
+  echo "  已安装 pagefind (Extended)"
+else
+  echo "  正在安装 pagefind (Extended) ..."
+  cargo install pagefind --features extended --locked --force
+fi
+rm -rf "$probe"
+'''
+
+[tasks.check-tools]
+description = "检查必需工具是否就绪"
+private = true
+script_runner = "@shell"
+script = '''
+missing=""
+command -v mdbook >/dev/null 2>&1 || missing="$missing mdbook"
+command -v pagefind >/dev/null 2>&1 || missing="$missing pagefind"
+if [ -n "$missing" ]; then
+  echo "缺少工具:$missing"
+  echo "请执行: cargo make setup"
+  exit 1
+fi
+'''
+
+# ---------------------------------------------------------------- 目录生成
+
+[tasks.summary]
+description = "生成 src/SUMMARY.md（保留手工排序，自动收录新增/移除失效条目）"
+command = "cargo"
+args = ["xtask", "summary"]
+
+[tasks.summary-check]
+description = "校验 SUMMARY.md 是否为最新"
+private = true
+command = "cargo"
+args = ["xtask", "summary", "--check"]
+
+# ---------------------------------------------------------------- 构建
+
+[tasks.mdbook-build]
+description = "执行 mdbook build"
+private = true
+command = "mdbook"
+args = ["build"]
+
+[tasks.prep-index]
+description = "建索引前处理产物：移除 print.html、标记导航页为不索引"
+private = true
+command = "cargo"
+args = ["xtask", "prep-index"]
+
+[tasks.pagefind]
+description = "生成 Pagefind 中文搜索索引"
+private = true
+# mdBook 自带搜索基于 elasticlunr，按空白分词，CJK 无法建立索引，故改用 Pagefind
+#
+# 必须使用 Extended 版（`cargo install pagefind --features extended`）：
+# 标准版不含 CJK 分词，会按字符切分，实测召回严重不足——
+#   「三体」搜不到《三体三部曲》(0 条)、「意义」0 条、「智能指针」仅 1 条。
+# Extended 版下这些查询分别为 5 / 8 / 3 条且首条精准。
+# 唯一代价是「所有权」首条为《薛兆丰经济学讲义》(目标页在 26 条结果内)。
+# 注意 Extended 通过 cargo feature 提供，不需要 Node.js。
+command = "pagefind"
+args = [
+  "--site", "book",
+  "--output-subdir", "_pagefind",
+  "--root-selector", "${PAGEFIND_ROOT_SELECTOR}",
+]
+
+[tasks.verify-pagefind-extended]
+description = "确认使用的是 Extended 版 pagefind（CJK 分词必需）"
+private = true
+script_runner = "@shell"
+script = '''
+set -e
+# 注意：`pagefind --version` 只输出 "pagefind 1.5.2"，不含 Extended 标识；
+# 只有实际运行时的横幅会打印 "Running Pagefind vX (Extended)"。
+# 因此用一个临时站点做探测。
+probe=$(mktemp -d)
+trap 'rm -rf "$probe"' EXIT
+printf '<html><body><main>探测中文分词能力</main></body></html>' > "$probe/index.html"
+
+if pagefind --site "$probe" 2>&1 | grep -qi 'extended'; then
+  exit 0
+fi
+
+cat >&2 <<'MSG'
+当前 pagefind 不是 Extended 版，中文搜索召回会严重不足。
+实测标准版下「三体」「意义」均返回 0 条结果。
+
+请重新安装：
+    cargo install pagefind --features extended --locked --force
+
+Extended 通过 cargo feature 提供，无需 Node.js。
+MSG
+exit 1
+'''
+
+[tasks.verify-index]
+description = "确认索引已生成"
+private = true
+script_runner = "@shell"
+script = '''
+if [ ! -f book/_pagefind/pagefind.js ]; then
+  echo "Pagefind 索引生成失败"
+  exit 1
+fi
+'''
+
+[tasks.build]
+description = "完整构建：生成目录 -> mdbook -> Pagefind 索引"
+dependencies = [
+  "check-tools",
+  "verify-pagefind-extended",
+  "summary",
+  "mdbook-build",
+  "prep-index",
+  "pagefind",
+  "verify-index",
+]
+script_runner = "@shell"
+script = '''echo "构建完成 -> book/"'''
+
+# ---------------------------------------------------------------- 预览
+
+[tasks.serve]
+description = "构建后启动本地预览（勿用 mdbook serve，它会清除 Pagefind 索引）"
+dependencies = ["build"]
+command = "cargo"
+args = ["xtask", "serve", "--port", "${SERVE_PORT}"]
+
+# ---------------------------------------------------------------- 校验
+
+[tasks.check]
+description = "CI 校验：目录是否最新 + 构建是否有警告"
+dependencies = ["check-tools", "summary-check"]
+script_runner = "@shell"
+script = '''
+set -e
+log=$(mktemp)
+trap 'rm -f "$log"' EXIT
+mdbook build 2>&1 | tee "$log"
+
+if grep -q "ERROR" "$log"; then
+  echo "mdbook 构建报错"
+  exit 1
+fi
+if grep -q "WARN" "$log"; then
+  echo ""
+  echo "构建存在警告："
+  grep "WARN" "$log" | sed 's/^/    /'
+  echo "常见原因：正文中的泛型未用反引号包裹（如 Rc<T> 会被当作 HTML 标签，导致内容丢失）"
+  exit 1
+fi
+echo "校验通过"
+'''
+
+# ---------------------------------------------------------------- 其他
+
+[tasks.test]
+description = "运行 xtask 单元测试"
+command = "cargo"
+args = ["test", "--package", "xtask"]
+
+[tasks.lint]
+description = "对 xtask 执行 clippy 检查"
+command = "cargo"
+args = ["clippy", "--package", "xtask", "--", "-D", "warnings"]
+
+[tasks.clean]
+description = "清理构建产物"
+script_runner = "@shell"
+script = '''
+rm -rf book
+echo "已清理 book/"
+'''

@@ -1,0 +1,311 @@
+/* Pagefind 搜索界面样式，跟随 mdBook 主题变量，自动适配明暗色
+ *
+ * 注意：不要使用 --searchbar-fg / --searchresults-header-fg 这类变量。
+ * 它们是 mdBook 为「浅色搜索框」设计的，在 navy/coal 主题下取值为 #000（纯黑），
+ * 与本组件使用的 --bg（近黑）搭配会导致黑底黑字完全不可见。
+ * 本组件统一以 --fg 为基准色，通过 color-mix 派生次要文字色，确保任何主题下都有足够对比度。
+ */
+
+/* 次要文字色不用 color-mix 固定比例——浅色主题(--fg 为黑)与深色主题(--fg 为浅灰)
+ * 所需的插值方向相反，固定比例无法同时满足。这里直接按主题分别指定，
+ * 保证各主题下对比度均高于 WCAG AA 的 4.5:1。 */
+/* 色阶体系（供 typography.css 一并使用）：
+ *   --pf-muted      次要文字（说明、时间戳、计数）
+ *   --pf-border     分隔线与描边
+ *   --pf-surface    浮起表面（代码块、引用块、表格条纹）
+ *   --pf-surface-2  更强的表面（表头、悬停）
+ *   --pf-accent     强调色，用于色条、边框、标记等「面」元素
+ *   --pf-accent-fg  强调色的文字版，在 --pf-surface 上需 >= 4.5:1
+ *
+ * 表面色要与页面背景有可见落差，否则整页元素会「糊」在一起显得很淡。
+ * accent 分成两个变量：作色块时可以鲜亮，作文字时必须加深到无障碍标准，
+ * 实测浅色主题下直接用鲜亮蓝作行内代码文字只有 4.15:1，不达标。 */
+/* 重要：mdBook 的主题 class 挂在 <html> 上（`<html class="navy ...">`），
+ * <body> 没有任何 class。因此必须用 `html.navy` 这类选择器，
+ * 写成 `body.navy` 永远不会匹配——那会让暗色主题继续使用浅色表面值，
+ * 导致「浅底 + 浅字」完全不可读（表格斑马纹曾因此不可读）。
+ * mdBook 自身也是用裸类选择器 `.navy {}` 定义变量的。 */
+:root {
+  --pf-muted: #595959;
+  --pf-border: #c9c9c9;
+  --pf-surface: #f2f4f7;
+  --pf-surface-2: #e4e8ee;
+  --pf-accent: #2f6feb;
+  --pf-accent-fg: #0a3ea8;
+}
+
+html.coal,
+html.navy,
+html.ayu {
+  --pf-muted: #a6a8b8;
+  --pf-border: #45485c;
+  --pf-surface: #232838;
+  --pf-surface-2: #2d3346;
+  --pf-accent: #4aa3d8;
+  --pf-accent-fg: #7fc4ec;
+}
+
+html.ayu {
+  --pf-surface: #1c232c;
+  --pf-surface-2: #26303c;
+  --pf-accent: #4ab8e8;
+  --pf-accent-fg: #7fd3f5;
+}
+
+html.coal {
+  --pf-surface: #1e2225;
+  --pf-surface-2: #282d31;
+}
+
+html.rust {
+  --pf-muted: #4d4a45;
+  --pf-border: #b8b4a8;
+  --pf-surface: #dedbd0;
+  --pf-surface-2: #cec9ba;
+  --pf-accent: #2b6ea2;
+  --pf-accent-fg: #14425f;
+}
+
+#pagefind-wrapper {
+  max-width: var(--content-max-width, 750px);
+  margin: 0 auto 2rem auto;
+  padding: 1rem var(--page-padding, 15px) 0.5rem;
+  border-bottom: 1px solid var(--pf-border);
+}
+
+#pagefind-wrapper.pagefind-hidden {
+  display: none;
+}
+
+#pagefind-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+/* 提示文字放在输入框下方，避免与输入框争夺横向空间造成重叠 */
+#pagefind-hint {
+  display: block;
+  margin-top: 0.4rem;
+  font-size: 0.78rem;
+  color: var(--pf-muted);
+}
+
+#pagefind-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0.6rem 0.8rem;
+  font-size: 1rem;
+  font-family: inherit;
+  color: var(--fg);
+  background-color: var(--bg);
+  border: 1px solid var(--pf-border);
+  border-radius: 4px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+#pagefind-input:focus {
+  border-color: var(--links, #4183c4);
+}
+
+#pagefind-input::placeholder {
+  color: var(--pf-muted);
+  opacity: 1; /* Firefox 默认给 placeholder 加透明度，需显式重置 */
+}
+
+#pagefind-results {
+  margin-top: 0.75rem;
+}
+
+.pagefind-count,
+.pagefind-empty {
+  padding: 0.5rem 0;
+  font-size: 0.9rem;
+  color: var(--pf-muted);
+  border-bottom: 1px solid var(--pf-border);
+}
+
+.pagefind-empty {
+  border-bottom: none;
+  color: var(--fg);
+}
+
+.pagefind-empty code {
+  padding: 0.1rem 0.3rem;
+  background-color: var(--quote-bg, rgba(128, 128, 128, 0.1));
+  border-radius: 3px;
+}
+
+a.pagefind-result {
+  display: block;
+  padding: 0.85rem 0.6rem;
+  color: var(--fg);
+  text-decoration: none;
+  border-bottom: 1px solid var(--pf-border);
+  border-radius: 3px;
+}
+
+a.pagefind-result:last-child {
+  border-bottom: none;
+}
+
+a.pagefind-result:hover,
+a.pagefind-result:focus {
+  background-color: var(--quote-bg, rgba(128, 128, 128, 0.12));
+  text-decoration: none;
+}
+
+.pagefind-result-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+  color: var(--links, #4183c4);
+}
+
+.pagefind-result-excerpt {
+  font-size: 0.9rem;
+  line-height: 1.7;
+  /* 不使用 opacity：它会连带作用于子元素 mark，导致高亮文字与背景混色不可读 */
+  color: var(--fg);
+}
+
+/* 高亮命中词：用下划线 + 轻背景，避免实色块盖住文字 */
+.pagefind-result-excerpt mark {
+  padding: 0.05em 0.15em;
+  color: var(--fg);
+  font-weight: 600;
+  background-color: transparent;
+  border-bottom: 2px solid var(--links, #4183c4);
+  border-radius: 0;
+}
+
+/* Kindle 摘录的分类/标签徽标（同时作为 Pagefind 的筛选维度载体） */
+.clipping-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.5rem 0 1.2rem 0;
+}
+
+.clipping-meta span {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  font-size: 0.78rem;
+  line-height: 1.6;
+  color: var(--fg);
+  background-color: var(--quote-bg, rgba(128, 128, 128, 0.12));
+  border: 1px solid var(--pf-border);
+  border-radius: 10px;
+  opacity: 0.9;
+}
+
+/* 搜索结果的标签筛选条 */
+#pagefind-filters {
+  margin-top: 0.6rem;
+}
+
+.pagefind-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--pf-border);
+}
+
+.pagefind-filter-label {
+  flex: 0 0 100%;
+  margin-bottom: 0.15rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  color: var(--pf-muted);
+}
+
+.pagefind-chip {
+  padding: 0.2rem 0.6rem;
+  font-size: 0.8rem;
+  font-family: inherit;
+  line-height: 1.5;
+  color: var(--fg);
+  background-color: transparent;
+  border: 1px solid var(--pf-border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.pagefind-chip:hover {
+  color: var(--links, #4183c4);
+  border-color: var(--links, #4183c4);
+}
+
+.pagefind-chip-active {
+  color: var(--bg);
+  background-color: var(--links, #4183c4);
+  border-color: var(--links, #4183c4);
+  font-weight: 600;
+}
+
+/* 结果标题右侧的标签，弱化处理避免与标题争夺注意力 */
+.pagefind-result-tags {
+  margin-left: 0.5rem;
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.pagefind-result-tags em {
+  display: inline-block;
+  padding: 0.05rem 0.4rem;
+  margin-right: 0.25rem;
+  font-size: 0.7rem;
+  font-style: normal;
+  font-weight: 400;
+  color: var(--pf-muted);
+  border: 1px solid var(--pf-border);
+  border-radius: 8px;
+  vertical-align: 0.1em;
+}
+
+/* 同一文档命中多个小节时展示的子结果，便于直接跳到对应位置 */
+.pagefind-result-group {
+  border-bottom: 1px solid var(--pf-border);
+}
+
+.pagefind-result-group > a.pagefind-result {
+  border-bottom: none;
+}
+
+.pagefind-subresults {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  padding: 0 0.6rem 0.7rem 0.6rem;
+}
+
+a.pagefind-subresult {
+  display: inline-block;
+  padding: 0.12rem 0.5rem;
+  font-size: 0.78rem;
+  color: var(--pf-muted);
+  text-decoration: none;
+  border: 1px solid var(--pf-border);
+  border-radius: 10px;
+}
+
+a.pagefind-subresult::before {
+  content: "# ";
+  opacity: 0.6;
+}
+
+a.pagefind-subresult:hover {
+  color: var(--links, #4183c4);
+  border-color: var(--links, #4183c4);
+  text-decoration: none;
+}
+
+/* 命中所在的小节，与其他小节区分 */
+a.pagefind-subresult-best {
+  color: var(--links, #4183c4);
+  border-color: var(--links, #4183c4);
+}

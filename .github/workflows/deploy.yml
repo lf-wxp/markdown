@@ -1,0 +1,127 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  # 支持手动触发
+  workflow_dispatch:
+
+# GITHUB_TOKEN 需要的权限
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 同一时间只允许一个部署；新推送会取消进行中的旧任务
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+env:
+  MDBOOK_VERSION: "0.5.4"
+  # mdbook-toc 需 >= 0.15：0.14.x 与 mdBook 0.5 不兼容
+  MDBOOK_TOC_VERSION: "0.15.4"
+  PAGEFIND_VERSION: "1.5.2"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # 缓存 cargo 产物：xtask 编译结果与已安装的工具二进制
+      # （pagefind Extended 需源码编译，缓存命中可省 2-4 分钟）
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            target
+          # key 含工具版本号，改版本时缓存自动失效，避免用到旧二进制
+          key: ${{ runner.os }}-cargo-${{ env.MDBOOK_VERSION }}-${{ env.MDBOOK_TOC_VERSION }}-${{ env.PAGEFIND_VERSION }}-${{ hashFiles('Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-${{ env.MDBOOK_VERSION }}-${{ env.MDBOOK_TOC_VERSION }}-${{ env.PAGEFIND_VERSION }}-
+            ${{ runner.os }}-cargo-
+
+      # binstall 自动匹配当前平台的预编译发布物，避免源码编译
+      - name: Install cargo-binstall
+        uses: cargo-bins/cargo-binstall@main
+
+      - name: Install build tools
+        run: |
+          set -euo pipefail
+          # mdbook / mdbook-toc 走 binstall 取预编译版本
+          cargo binstall --no-confirm --locked \
+            "mdbook@${MDBOOK_VERSION}" \
+            "mdbook-toc@${MDBOOK_TOC_VERSION}"
+
+          # pagefind 必须启用 extended feature 才有 CJK 分词，
+          # 标准版会导致中文召回严重不足（实测「三体」「意义」为 0 条）。
+          # binstall 无法指定 feature，只能源码编译（约 2-4 分钟），
+          # 故先检测缓存中是否已有可用的 Extended 版，命中则跳过编译。
+          probe=$(mktemp -d)
+          printf '<html><body><main>probe</main></body></html>' > "$probe/index.html"
+          need_install=1
+          if command -v pagefind >/dev/null 2>&1; then
+            if pagefind --site "$probe" 2>&1 | grep -qi extended; then
+              echo "缓存中已有 Extended 版 pagefind，跳过编译"
+              need_install=0
+            fi
+          fi
+          if [ "$need_install" = 1 ]; then
+            cargo install pagefind --version "${PAGEFIND_VERSION}" \
+              --features extended --locked --force
+          fi
+
+          mdbook --version
+          mdbook-toc --version
+          # 注意：`pagefind --version` 只输出 "pagefind 1.5.2"，不含 Extended 标识，
+          # 只有实际运行时的横幅才会打印 "(Extended)"，故用临时站点探测。
+          pagefind --site "$probe" 2>&1 | grep -qi extended \
+            || { echo "::error::pagefind 不是 Extended 版，中文搜索会失效"; exit 1; }
+          rm -rf "$probe"
+
+      - name: Run xtask tests
+        run: cargo test --package xtask
+
+      # 目录必须是最新的，否则新增笔记不会出现在侧边栏
+      - name: Verify SUMMARY.md is up to date
+        run: cargo run --release --package xtask -- summary --check
+
+      - name: Build site
+        run: |
+          set -euo pipefail
+          mdbook build 2>&1 | tee build.log
+          # 正文中的泛型未加反引号会被当作 HTML 标签导致内容丢失，
+          # 这类问题只表现为 WARN，必须视为失败
+          if grep -qE 'ERROR|WARN' build.log; then
+            echo "::error::mdbook 构建存在 ERROR/WARN"
+            grep -E 'ERROR|WARN' build.log
+            exit 1
+          fi
+
+      - name: Prepare index and build search
+        run: |
+          set -euo pipefail
+          cargo run --release --package xtask -- prep-index
+          pagefind --site book --output-subdir _pagefind --root-selector main
+          test -f book/_pagefind/pagefind.js
+          # mdBook 自动生成 .nojekyll，缺失会导致 Pages 忽略 _pagefind/ 目录
+          test -f book/.nojekyll
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: book
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
