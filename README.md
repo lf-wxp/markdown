@@ -58,23 +58,24 @@ cargo make lint      # clippy
 `.github/workflows/deploy.yml` 会在 push 到 `main` 时自动构建并发布到
 `https://lf-wxp.github.io/markdown/`，也可在 Actions 页手动触发（`workflow_dispatch`）。
 
-### 首次启用
+### 首次启用（必须手动做一次）
 
-工作流中的 `actions/configure-pages@v5` 带 `enablement: true`，会尝试自动开启 Pages。
-若该步骤因权限受限而跳过，`deploy` 阶段会失败并报：
+**Settings → Pages → Build and deployment → Source** 选择 **GitHub Actions**
+
+未启用时 `deploy` 阶段会失败并报：
 
 ```
 Error: Failed to create deployment (status: 404)
 Ensure GitHub Pages has been enabled
 ```
 
-此时手动设置一次即可：
+设置好后对失败的运行点 **Re-run jobs** 即可。
 
-**Settings → Pages → Build and deployment → Source** 选择 **GitHub Actions**
+> 这一步无法自动化。`actions/configure-pages` 虽有 `enablement: true` 参数，
+> 但实测 `GITHUB_TOKEN` 无权创建 Pages 站点，会报
+> `Create Pages site failed. Resource not accessible by integration`。
 
-然后对失败的那次运行点 **Re-run failed jobs**（构建产物仍在，只会重跑部署）。
-
-> 日志中出现 `Node.js 20 is deprecated ... actions/deploy-pages@v4` 属于弃用警告，
+> 日志中的 `Node.js 20 is deprecated ... actions/deploy-pages@v4` 属于弃用警告，
 > GitHub 会自动转用 Node 24 执行，不影响部署。等官方发布 v5 后再升级即可。
 
 工作流包含的质量门禁：

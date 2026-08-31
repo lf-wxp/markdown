@@ -29,17 +29,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # 尝试自动启用 Pages（enablement: true）。
-      # 若仓库尚未开启 Pages，deploy 阶段会报
-      #   "Failed to create deployment (status: 404)"
-      # 这一步能免去手动开关；无权限时不阻断构建，改为手动设置：
+      # 说明：不使用 actions/configure-pages 的 enablement: true。
+      # 实测 GITHUB_TOKEN 无权创建 Pages 站点，会报
+      #   "Create Pages site failed. Resource not accessible by integration"
+      # 首次启用只能手动操作一次（之后无需再管）：
       #   Settings → Pages → Build and deployment → Source → GitHub Actions
-      - name: Configure Pages
-        id: pages
-        continue-on-error: true
-        uses: actions/configure-pages@v5
-        with:
-          enablement: true
 
       # 缓存 cargo 产物：xtask 编译结果与已安装的工具二进制
       # （pagefind Extended 需源码编译，缓存命中可省 2-4 分钟）
