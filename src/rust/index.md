@@ -8,7 +8,7 @@
 - [生命周期](./lifetime.md)
 - [泛型](./泛型.md)
 - [trait 与 trait对象](./trait对象.md)
-- [newtype](./deepInType.md)
+- [深入类型](./deepInType.md)
 - [闭包](./closure.md)
 - [iterator](./iterator.md)
 - [智能指针](./智能指针.md)

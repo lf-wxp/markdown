@@ -17,17 +17,17 @@ concurrency:
   group: pages
   cancel-in-progress: true
 
-env:
-  MDBOOK_VERSION: "0.5.4"
-  # mdbook-toc 需 >= 0.15：0.14.x 与 mdBook 0.5 不兼容
-  MDBOOK_TOC_VERSION: "0.15.4"
-  PAGEFIND_VERSION: "1.5.2"
-
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      # 工具版本只在 tools.env 里声明一处，Dockerfile 与 cargo make setup 同源，
+      # 避免本地装最新版而这里钉在旧版，出现「本地能过、CI 挂掉」
+      - name: Load tool versions
+        # 只取 KEY=value 行：$GITHUB_ENV 不接受注释和空行
+        run: grep -E '^[A-Z][A-Z0-9_]*=' tools.env >> "$GITHUB_ENV"
 
       # 说明：不使用 actions/configure-pages 的 enablement: true。
       # 实测 GITHUB_TOKEN 无权创建 Pages 站点，会报
@@ -92,8 +92,14 @@ jobs:
       - name: Run xtask tests
         run: cargo test --package xtask
 
-      # 目录必须是最新的，否则新增笔记不会出现在侧边栏
-      - name: Verify SUMMARY.md is up to date
+      # 列表标记、标题层级这类问题不会让 mdbook 报警，但产物是坏的：
+      # 曾有 257 行因为用 `·` 当列表标记而渲染成字面符号
+      - name: Lint content conventions
+        run: cargo run --release --package xtask -- lint
+
+      # 目录、章节首页与主题索引页必须都是最新的，
+      # 否则新增笔记不会出现在侧边栏或索引页；条目缺 topic 也在此拦下
+      - name: Verify generated indexes are up to date
         run: cargo run --release --package xtask -- summary --check
 
       - name: Build site

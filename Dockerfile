@@ -15,16 +15,13 @@
 # ---------------------------------------------------------------- 构建阶段
 FROM rust:1.98-slim AS builder
 
-# 版本固定，保证镜像可复现
-# mdbook-toc 需 >= 0.15：0.14.x 与 mdBook 0.5 不兼容，
-# 会导致 "The toc preprocessor exited unsuccessfully"
-ARG MDBOOK_VERSION=0.5.4
-ARG MDBOOK_TOC_VERSION=0.15.4
-ARG PAGEFIND_VERSION=1.5.2
-
 RUN apt-get update \
     && apt-get install -y --no-install-recommends curl ca-certificates \
     && rm -rf /var/lib/apt/lists/*
+
+# 版本固定，保证镜像可复现。取自 tools.env——CI 与 cargo make setup 用的是同一份，
+# 避免三处各自声明后悄悄漂移。
+COPY tools.env /tmp/tools.env
 
 # cargo-binstall 自身也优先取预编译版本，安装很快
 RUN curl -fsSL https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash \
@@ -33,16 +30,18 @@ RUN curl -fsSL https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/
 # mdbook / mdbook-toc 用 binstall 取预编译版本；
 # pagefind 必须启用 extended feature 才具备 CJK 分词（binstall 无法指定 feature，
 # 故从源码编译）。标准版会使中文召回严重不足：实测「三体」「意义」返回 0 条结果。
-RUN cargo binstall --no-confirm --locked \
+RUN set -eux; \
+    . /tmp/tools.env; \
+    cargo binstall --no-confirm --locked \
         "mdbook@${MDBOOK_VERSION}" \
-        "mdbook-toc@${MDBOOK_TOC_VERSION}" \
-    && cargo install pagefind --version "${PAGEFIND_VERSION}" \
-        --features extended --locked \
-    && mdbook --version \
-    && mdbook-toc --version \
-    && printf '<html><body><main>probe</main></body></html>' > /tmp/i.html \
-    && pagefind --site /tmp 2>&1 | grep -qi extended \
-    && rm -rf /tmp/i.html /tmp/pagefind
+        "mdbook-toc@${MDBOOK_TOC_VERSION}"; \
+    cargo install pagefind --version "${PAGEFIND_VERSION}" \
+        --features extended --locked; \
+    mdbook --version; \
+    mdbook-toc --version; \
+    printf '<html><body><main>probe</main></body></html>' > /tmp/i.html; \
+    pagefind --site /tmp 2>&1 | grep -qi extended; \
+    rm -rf /tmp/i.html /tmp/pagefind
 
 WORKDIR /build
 
@@ -59,14 +58,16 @@ RUN touch xtask/src/main.rs && cargo build --release --package xtask
 
 COPY src ./src
 COPY theme ./theme
-COPY book.toml ./
+COPY book.toml book-meta.toml ./
 
 # 构建流程与本地 cargo make build 保持一致：
-#   1) 生成 SUMMARY.md
-#   2) mdbook build（出现 WARN/ERROR 即失败，避免把内容丢失的产物打进镜像）
-#   3) 移除 print.html、标记导航页为不索引
-#   4) Pagefind 建索引（仅索引 <main> 正文）
+#   1) 检查正文写作约定（列表标记、标题层级、内部死链）
+#   2) 生成 SUMMARY.md、各章节首页与主题索引页
+#   3) mdbook build（出现 WARN/ERROR 即失败，避免把内容丢失的产物打进镜像）
+#   4) 移除 print.html、标记导航页为不索引
+#   5) Pagefind 建索引（仅索引 <main> 正文）
 RUN set -eux; \
+    ./target/release/xtask lint; \
     ./target/release/xtask summary; \
     mdbook build 2>&1 | tee /tmp/build.log; \
     if grep -qE 'ERROR|WARN' /tmp/build.log; then \

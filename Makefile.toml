@@ -4,8 +4,11 @@
 #   cargo make build     构建到 book/
 #   cargo make serve     构建后启动本地预览
 #   cargo make check     校验（CI 用，不写文件）
-#   cargo make summary   仅重新生成 SUMMARY.md
+#   cargo make summary   仅重新生成目录与索引页
 #   cargo make setup     安装所需工具链
+#
+# 新增一篇文档用 xtask（cargo-make 不便透传参数）：
+#   cargo xtask new english/analysis --topic 倒装结构 --title '...' --quote '...'
 #
 # 设计说明：整条链路只依赖 Rust 工具链，无 Python / Node 依赖。
 
@@ -22,44 +25,83 @@ SERVE_PORT = { value = "8000", condition = { env_not_set = ["SERVE_PORT"] } }
 # ---------------------------------------------------------------- 工具链安装
 
 [tasks.setup]
-description = "安装构建所需的全部工具（mdbook / mdbook-toc / pagefind）"
+description = "安装构建所需的全部工具（版本取自 tools.env）"
 script_runner = "@shell"
 script = '''
 set -e
-for tool in mdbook mdbook-toc; do
-  if command -v "$tool" >/dev/null 2>&1; then
-    echo "  已安装 $tool"
-  else
-    echo "  正在安装 $tool ..."
-    cargo install "$tool" --locked
+# 版本统一来自 tools.env，与 CI、Dockerfile 用的是同一份
+. ./tools.env
+
+# 「装过了」不等于「版本对」：早先这里不带版本号装最新版，而 CI 钉死 0.5.4，
+# 两边可能跑在不同 mdbook 上。版本不符时强制重装。
+ensure() {
+  name=$1
+  want=$2
+  have=$("$name" --version 2>/dev/null | awk '{print $2}' | sed 's/^v//')
+  if [ "$have" = "$want" ]; then
+    echo "  已安装 $name $want"
+    return
   fi
-done
+  # 变量紧跟中文标点时必须加花括号：sh 会把全角字符的首字节
+  # 当成变量名的一部分，$want（ 会被解析成一个不存在的变量
+  echo "  正在安装 $name ${want}（当前：${have:-未安装}）..."
+  cargo install "$name" --version "$want" --locked --force
+}
+
+ensure mdbook "$MDBOOK_VERSION"
+ensure mdbook-toc "$MDBOOK_TOC_VERSION"
 
 # pagefind 必须启用 extended feature 才具备 CJK 分词能力，
 # 否则中文搜索召回严重不足（实测「三体」「意义」返回 0 条）。
 # --version 不含 Extended 标识，只有运行时横幅有，故用临时站点探测。
 probe=$(mktemp -d)
 printf '<html><body><main>探测</main></body></html>' > "$probe/index.html"
-if command -v pagefind >/dev/null 2>&1 \
+pf_have=$(pagefind --version 2>/dev/null | awk '{print $2}')
+if [ "$pf_have" = "$PAGEFIND_VERSION" ] \
    && pagefind --site "$probe" 2>&1 | grep -qi extended; then
-  echo "  已安装 pagefind (Extended)"
+  echo "  已安装 pagefind $PAGEFIND_VERSION (Extended)"
 else
-  echo "  正在安装 pagefind (Extended) ..."
-  cargo install pagefind --features extended --locked --force
+  echo "  正在安装 pagefind $PAGEFIND_VERSION (Extended)（当前：${pf_have:-未安装}）..."
+  cargo install pagefind --version "$PAGEFIND_VERSION" \
+    --features extended --locked --force
 fi
 rm -rf "$probe"
 '''
 
 [tasks.check-tools]
-description = "检查必需工具是否就绪"
+description = "检查必需工具是否就绪，且版本与 tools.env 一致"
 private = true
 script_runner = "@shell"
+# 只查「装没装」是不够的：版本不同会让本地和 CI 产出不同的站点，
+# 而 mdbook-toc 0.14 与 mdBook 0.5 不兼容这类问题已经踩过一次。
 script = '''
-missing=""
-command -v mdbook >/dev/null 2>&1 || missing="$missing mdbook"
-command -v pagefind >/dev/null 2>&1 || missing="$missing pagefind"
-if [ -n "$missing" ]; then
-  echo "缺少工具:$missing"
+. ./tools.env
+
+bad=0
+report() {
+  [ "$bad" = 0 ] && echo "工具链与 tools.env 不一致："
+  bad=1
+  echo "  $1"
+}
+
+expect() {
+  name=$1
+  want=$2
+  have=$("$name" --version 2>/dev/null | awk '{print $2}' | sed 's/^v//')
+  if [ -z "$have" ]; then
+    # 花括号不能省：见 setup 任务里的说明
+    report "$name 未安装（需要 ${want}）"
+  elif [ "$have" != "$want" ]; then
+    report "$name 版本为 ${have}，tools.env 要求 $want"
+  fi
+}
+
+expect mdbook "$MDBOOK_VERSION"
+expect mdbook-toc "$MDBOOK_TOC_VERSION"
+expect pagefind "$PAGEFIND_VERSION"
+
+if [ "$bad" = 1 ]; then
+  echo ""
   echo "请执行: cargo make setup"
   exit 1
 fi
@@ -68,12 +110,12 @@ fi
 # ---------------------------------------------------------------- 目录生成
 
 [tasks.summary]
-description = "生成 src/SUMMARY.md（保留手工排序，自动收录新增/移除失效条目）"
+description = "重建目录、章节首页与主题索引页（保留手工排序，自动收录新增/移除失效条目）"
 command = "cargo"
 args = ["xtask", "summary"]
 
 [tasks.summary-check]
-description = "校验 SUMMARY.md 是否为最新"
+description = "校验目录与索引页是否为最新"
 private = true
 command = "cargo"
 args = ["xtask", "summary", "--check"]
@@ -81,10 +123,30 @@ args = ["xtask", "summary", "--check"]
 # ---------------------------------------------------------------- 构建
 
 [tasks.mdbook-build]
-description = "执行 mdbook build"
+description = "执行 mdbook build，出现 WARN/ERROR 即失败"
 private = true
-command = "mdbook"
-args = ["build"]
+script_runner = "@shell"
+# WARN 不是可以放过的噪音：正文里的泛型没加反引号会被当成 HTML 标签，
+# mdbook 只报 WARN，但产物里那段内容已经丢了。CI 与 Dockerfile 都按此标准，
+# 本地构建同样拦截，避免「本地能过、CI 挂掉」。
+script = '''
+set -e
+log=$(mktemp)
+trap 'rm -f "$log"' EXIT
+mdbook build 2>&1 | tee "$log"
+
+if grep -q "ERROR" "$log"; then
+  echo "mdbook 构建报错"
+  exit 1
+fi
+if grep -q "WARN" "$log"; then
+  echo ""
+  echo "构建存在警告："
+  grep "WARN" "$log" | sed 's/^/    /'
+  echo "常见原因：正文中的泛型未用反引号包裹（如 Rc<T> 会被当作 HTML 标签，导致内容丢失）"
+  exit 1
+fi
+'''
 
 [tasks.prep-index]
 description = "建索引前处理产物：移除 print.html、标记导航页为不索引"
@@ -148,6 +210,11 @@ if [ ! -f book/_pagefind/pagefind.js ]; then
   echo "Pagefind 索引生成失败"
   exit 1
 fi
+# Pages 默认经 Jekyll 处理会跳过 _ 开头的目录，缺少 .nojekyll 时线上搜索会 404
+if [ ! -f book/.nojekyll ]; then
+  echo "缺少 book/.nojekyll，部署后 _pagefind/ 会被 Pages 忽略"
+  exit 1
+fi
 '''
 
 [tasks.build]
@@ -155,6 +222,7 @@ description = "完整构建：生成目录 -> mdbook -> Pagefind 索引"
 dependencies = [
   "check-tools",
   "verify-pagefind-extended",
+  "lint",
   "summary",
   "mdbook-build",
   "prep-index",
@@ -175,28 +243,22 @@ args = ["xtask", "serve", "--port", "${SERVE_PORT}"]
 # ---------------------------------------------------------------- 校验
 
 [tasks.check]
-description = "CI 校验：目录是否最新 + 构建是否有警告"
-dependencies = ["check-tools", "summary-check"]
+# 与 build 走完全相同的链路，只把 summary 换成 summary-check（不写文件）。
+# 早先 check 只到 mdbook build 为止，pagefind 那几步要推到 main 才会被验证，
+# 搜索相关的改动因此可能本地全绿、线上才发现坏掉。
+description = "CI 校验：与部署流程等价，但目录只校验不写入"
+dependencies = [
+  "check-tools",
+  "verify-pagefind-extended",
+  "lint",
+  "summary-check",
+  "mdbook-build",
+  "prep-index",
+  "pagefind",
+  "verify-index",
+]
 script_runner = "@shell"
-script = '''
-set -e
-log=$(mktemp)
-trap 'rm -f "$log"' EXIT
-mdbook build 2>&1 | tee "$log"
-
-if grep -q "ERROR" "$log"; then
-  echo "mdbook 构建报错"
-  exit 1
-fi
-if grep -q "WARN" "$log"; then
-  echo ""
-  echo "构建存在警告："
-  grep "WARN" "$log" | sed 's/^/    /'
-  echo "常见原因：正文中的泛型未用反引号包裹（如 Rc<T> 会被当作 HTML 标签，导致内容丢失）"
-  exit 1
-fi
-echo "校验通过"
-'''
+script = '''echo "校验通过：正文合规、目录最新、构建无警告、搜索索引可生成"'''
 
 # ---------------------------------------------------------------- 其他
 
@@ -205,10 +267,23 @@ description = "运行 xtask 单元测试"
 command = "cargo"
 args = ["test", "--package", "xtask"]
 
-[tasks.lint]
+[tasks.clippy]
 description = "对 xtask 执行 clippy 检查"
 command = "cargo"
 args = ["clippy", "--package", "xtask", "--", "-D", "warnings"]
+
+[tasks.lint]
+# README 的写作约定过去只是文档里的一段话，而约定写进文档等于没写：
+# 先是 6 个文件用 `_` / `\*` 当列表标记（34 行），修好后又出现 9 个文件用 `·`（257 行）。
+# mdbook 对此一律不报警，构建全绿而产物是坏的，只能靠这一步兜住。
+description = "检查正文写作约定（列表标记、标题层级、裸 HTML 块）"
+command = "cargo"
+args = ["xtask", "lint"]
+
+[tasks.lint-fix]
+description = "检查正文写作约定，并自动修复可机械修复的部分"
+command = "cargo"
+args = ["xtask", "lint", "--fix"]
 
 [tasks.clean]
 description = "清理构建产物"

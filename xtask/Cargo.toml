@@ -3,7 +3,7 @@ name = "xtask"
 version = "0.1.0"
 edition = "2021"
 publish = false
-description = "知识库构建辅助工具：生成 SUMMARY.md"
+description = "知识库构建辅助工具：目录与索引生成、条目脚手架、正文检查、预览服务"
 
 [[bin]]
 name = "xtask"

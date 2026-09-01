@@ -1,4 +1,4 @@
 # English
 
-- [Phonetics](./phonetics.md)
-- [Analysis](./analysis.md)
+- [英语发音规则](./phonetics.md)
+- [句子分析](./analysis.md)

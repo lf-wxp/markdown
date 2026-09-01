@@ -8,19 +8,27 @@
 Cargo.toml        # workspace 定义
 Makefile.toml     # cargo-make 任务定义（构建入口）
 book.toml         # mdBook 配置
-xtask/            # Rust 构建工具：SUMMARY 生成 / 索引预处理 / 预览服务
+book-meta.toml    # 分区与主题分类定义，目录生成的唯一配置源
+tools.env         # 构建工具版本，CI / Docker / 本地共用同一份
+xtask/            # Rust 构建工具：目录生成 / 条目脚手架 / 索引预处理 / 预览服务
 theme/
   typography.css  # 正文排版样式（标题层次 / 代码块 / 表格 / 引用块）
   pagefind.css    # 搜索界面样式，同时定义共用的颜色变量
   pagefind-init.js# 搜索前端逻辑
 src/
-  SUMMARY.md      # 侧边栏目录，由 xtask 生成，不要手工新增条目
+  SUMMARY.md      # 侧边栏目录（生成物）
   README.md       # 首页
   english/        # 英语笔记
+    index.md      # 章节首页（生成物）
+    analysis.md   # 句子分析的主题索引页（生成物）
+    analysis/     # 一个知识点一个文件
   philosophy/     # 哲学笔记
   rust/           # Rust 笔记
   clipping/       # Kindle 摘录
 ```
+
+> 标注为「生成物」的文件由 `cargo make summary` 重建，**不要手工编辑**。
+> 唯一的例外是 `SUMMARY.md` 里的条目顺序，工具会原样保留。
 
 ## 环境要求
 
@@ -31,14 +39,33 @@ cargo install cargo-make   # 任务运行器
 cargo make setup           # 安装 mdbook / mdbook-toc / pagefind
 ```
 
+版本号统一写在 `tools.env`，CI、Dockerfile 与 `cargo make setup` 都读这一份。
+已装但版本不符时 `setup` 会重装，`build` / `check` 则会直接拒绝执行——
+本地与线上跑在不同 mdbook 上是「本地能过、CI 挂掉」的常见来源。
+
 ## 构建与预览
 
 ```sh
 cargo make build     # 构建到 book/
 cargo make serve     # 构建后启动预览 http://127.0.0.1:8000
-cargo make check     # CI 校验：目录是否最新 + 构建是否有警告
-cargo make summary   # 仅重新生成 SUMMARY.md
+cargo make check     # CI 校验，与部署流程等价但不写目录
+cargo make summary   # 仅重新生成目录与索引页
+cargo make lint      # 检查正文写作约定
+cargo make lint-fix  # 同上，并自动修复可机械修复的部分
 cargo make clean     # 清理 book/
+```
+
+`check` 与 `build` 走完全相同的链路（含正文检查与 Pagefind 建索引），
+区别只是 `check` 用 `summary --check` 不写文件。两者都会在 mdbook 输出
+`WARN` 时失败——正文里的泛型没加反引号只报 WARN，但那段内容在产物里已经丢了。
+
+新增一篇笔记（`cargo-make` 不便透传参数，这里直接用 xtask）：
+
+```sh
+cargo xtask new english/analysis \
+    --topic 倒装结构 \
+    --title '否定前置倒装：Nor' \
+    --quote 'Nor is the harm produced by creation trivial'
 ```
 
 预览端口可覆盖：`SERVE_PORT=9000 cargo make serve`
@@ -50,7 +77,7 @@ cargo make clean     # 清理 book/
 
 ```sh
 cargo make test      # 单元测试
-cargo make lint      # clippy
+cargo make clippy    # clippy
 ```
 
 ## GitHub Pages 部署
@@ -80,11 +107,13 @@ Ensure GitHub Pages has been enabled
 
 工作流包含的质量门禁：
 
-1. `cargo test --package xtask` —— 10 个单元测试
-2. `xtask summary --check` —— 目录未更新则失败，避免新笔记漏出现在侧边栏
-3. mdbook 输出含 `WARN`/`ERROR` 即失败 —— 拦截「泛型未加反引号导致内容丢失」这类问题
-4. 校验 pagefind 为 Extended 版 —— 否则中文搜索会失效
-5. 校验 `_pagefind/pagefind.js` 与 `.nojekyll` 存在
+1. `cargo test --package xtask` —— 61 个单元测试
+2. `xtask lint` —— 正文写作约定与内部死链，见[写作约定](#写作约定)
+3. `xtask summary --check` —— 目录、章节首页或主题索引页未更新即失败；
+   条目缺 `topic` 或主题未声明也会失败，避免新笔记漏出现在侧边栏或索引页
+4. mdbook 输出含 `WARN`/`ERROR` 即失败 —— 拦截「泛型未加反引号导致内容丢失」这类问题
+5. 校验 pagefind 为 Extended 版 —— 否则中文搜索会失效
+6. 校验 `_pagefind/pagefind.js` 与 `.nojekyll` 存在
 
 ### 子路径部署的两个坑
 
@@ -212,9 +241,17 @@ Extended 通过 cargo feature 提供，**不需要 Node.js**。
 搜索时结果上方会出现标签筛选条，点击即可过滤，再次点击取消。
 新增摘录时按同样格式添加即可自动进入筛选维度。
 
-## 目录维护
+## 目录与索引维护
 
-`src/SUMMARY.md` 由 `xtask` 生成（`cargo make summary`），特性：
+`cargo make summary` 一次重建三类文件，它们都是生成物：
+
+| 文件 | 内容 |
+| --- | --- |
+| `src/SUMMARY.md` | 侧边栏目录 |
+| `src/<分区>/index.md` | 章节首页，条目顺序与侧边栏一致 |
+| `src/english/analysis.md` | 按语法主题分组的索引页 |
+
+共同特性：
 
 - **保留手工顺序**：已有条目顺序不变
   （`rust/` 按由浅入深、`philosophy/` 按哲学史时间线排列，不会被字母序覆盖）
@@ -223,24 +260,130 @@ Extended 通过 cargo feature 提供，**不需要 Node.js**。
 - **标题取自 H1**：优先使用文件内的一级标题，回退到文件名
 - **幂等**：重复执行结果一致，可安全放进 CI
 
-新增笔记后执行 `cargo make build` 即可，无需手工改 `SUMMARY.md`。
-若想调整章节顺序，直接编辑 `SUMMARY.md`，后续生成会保持你的顺序。
+想调整章节顺序就直接编辑 `SUMMARY.md`，后续生成会保持你的顺序，
+章节首页也会跟着一起变——两处不会各写一份，也就不会漂移。
+
+### 分区与分类配置
+
+分区划分和语法主题都定义在根目录的 `book-meta.toml`，**加一个分类不需要改代码**：
+
+```toml
+[[section]]
+dir = "philosophy"
+part = "Philosophy"          # 侧边栏 Part 标题
+title = "Philosophy"         # 章节首页 H1
+intro = "《西方哲学史》阅读笔记，按哲学史时间线组织。"
+
+[[topic_index]]
+index = "english/analysis.md"
+dir = "english/analysis"     # 必须与 index 同名
+title = "句子分析"
+topics = ["倒装结构", "比较结构"]   # 分组及其展示顺序
+```
+
+### 文件内的元信息
+
+mdBook 0.5 不解析 frontmatter，元信息用 HTML 注释承载（渲染时不可见），
+只在正文前 8 行内生效：
+
+| 注释 | 作用 |
+| --- | --- |
+| `<!-- topic: 倒装结构 -->` | 归入主题索引页的哪一组。主题目录下**必填** |
+| `<!-- label: 短标题 -->` | 主题索引页中的链接文字，默认用 H1 |
+| `<!-- desc: 一句话说明 -->` | 章节首页中跟在链接后的说明 |
+
+一条可以同时归入多个主题，用逗号分隔即可：
+
+```markdown
+<!-- topic: 倒装结构, 从句结构 -->
+```
+
+这条会在两个分组下各出现一次，侧边栏里仍然只有一条。跨知识点的句子
+（例如既是让步倒装、又是多重定语从句）不必再被迫只选一个最核心的主题。
+
+主题目录（`english/analysis/`）下的文件如果漏写 `topic`，或者写了一个
+`book-meta.toml` 里没声明的主题，**构建会直接失败**并列出问题文件：
+
+```
+error: 内容校验未通过，共 1 处：
+  × english/analysis/70-xxx.md 的主题「倒装」未在 book-meta.toml 中声明
+```
+
+这是刻意的——早先的实现只打印一行警告，结果是新条目静默地不出现在索引页里，
+而 CI 依然是绿的。
+
+### 新增条目
+
+用 `cargo xtask new` 生成，它会自动接上编号、从原句里取 slug、写好元信息，
+然后立刻同步目录与索引页：
+
+```sh
+cargo xtask new english/analysis \
+    --topic 倒装结构 \
+    --title '否定前置倒装：Nor' \
+    --quote 'Nor is the harm produced by creation trivial'
+# 已创建 src/english/analysis/70-nor-harm-produced-by-creation.md
+```
+
+参数：
+
+| 参数 | 说明 |
+| --- | --- |
+| `--title` | 必填，作为文件 H1 |
+| `--topic` | 主题索引目录下必填；写错会列出全部可选主题 |
+| `--quote` | 引用的原句，同时作为 slug 来源 |
+| `--label` / `--desc` | 对应上表的两个元信息，可选 |
+| `--slug` | 自定义文件名。标题与原句都没有英文时必须指定 |
+
+`--topic` 可以重复传，也可以在一个取值里用逗号分隔多个。
+普通分区（如 `rust/`）不带编号前缀，也不接受 `--topic`。
+
+### 关于编号前缀
+
+`english/analysis/` 用 `01-` 这样的前缀排序，编号由 `cargo xtask new` 自动取
+现有最大值 +1。排序按**数值**而非字面比较，所以编号从两位进到三位
+（`99-` → `100-`）不会打乱顺序，补零宽度只剩美观意义，不需要重排文件。
 
 ## 写作约定
 
-- 每篇文章只保留一个一级标题（`#`），其余用 `##` / `###` 逐级下沉
-  （xtask 依赖 H1 生成侧边栏标题）
+这些约定曾经只写在这一节里，而**约定写进文档等于没写**：先是 6 个文件用
+`_` / `\*` 当列表标记（34 行渲染成字面符号），修好之后又出现 9 个文件用 `·`
+当列表标记，一次坏掉 257 行。mdbook 对这类问题一律不报警，构建全绿而产物是坏的。
+
+因此能机械判定的都由 `cargo make lint` 拦下，它在 `build` / `check` / CI /
+Docker 构建中都会先跑一遍：
+
+| 规则 | 检查内容 |
+| --- | --- |
+| `bullet` | 行首出现 `·` `•` `‧` `_` `\*` —— 它们不是列表标记，会渲染成字面符号 |
+| `h1` | 每篇必须恰好一个一级标题（xtask 依赖 H1 生成侧边栏标题） |
+| `html-blank` | 裸 HTML 块后要留空行，否则紧随的 Markdown 不被解析 |
+| `link` | 仓库内部链接（含图片）指向的文件必须存在 |
+
+`bullet` 可以自动修复：
+
+```sh
+cargo make lint-fix
+```
+
+修复只替换行首标记、保留原有缩进，代码块与正文里的间隔号（如「阿瑟·叔本华」）
+不受影响。
+
+仍需人工留意、工具查不了的：
+
 - **标题要短**（建议 30 字符内）。标题会进侧边栏与页内目录，
   用整句长文本当标题会把导航撑爆（曾用整句英文例句作 H4，导致侧边栏不可用）
 - 正文中出现泛型、标签等内容（如 `Rc<T>`、`Box<dyn Trait>`）必须用反引号包裹，
-  否则会被解析成 HTML 标签导致内容丢失
+  否则会被解析成 HTML 标签导致内容丢失（这条由 mdbook 的 `WARN` 拦截）
 - **反引号只用于代码**。人名、书名等用 `**加粗**`；反引号会被渲染成
   带底色描边的行内代码，语义与视觉都不对
-- **裸 HTML 块（如 `<div>`）后必须留一个空行**，否则紧随其后的 Markdown
-  不会被解析（曾导致 23 篇摘录的引用块渲染成字面的 `>` 符号）
-- **列表标记必须是 `-` 或 `*`**。曾有 6 个文件用 `_` 或 `\*`，
-  34 行列表全部渲染成字面符号
-- 提交前执行 `cargo make check`，确保无 `WARN` / `ERROR`
+- **表格要写竖线**。从对话工具粘贴的表格常常只剩空格分隔，
+  会整块塌成一段正文（曾有 6 处如此）。这条没做成规则：判据太模糊，
+  误报会比漏报更消耗信任
+- 提交前执行 `cargo make check`
+
+> 死链只查仓库内部链接。外链要联网，在 CI 里既慢又不稳定——对方限流或临时
+> 抽风都会变成一次假失败。内部链接才是改名、拆分文件时真正会断的那一类。
 
 ## 排版说明
 

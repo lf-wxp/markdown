@@ -62,21 +62,21 @@ impl<'a> ImportantExcerpt<'a> {
       field: &'a T
   }
   ```
-# &‘static
+## &‘static
 `&'static` 对于生命周期有着非常强的要求：一个<mark>引用</mark>必须要活得跟剩下的程序一样久，才能被标注为 `&'static`。
 
 
 `&'static` 生命周期针对的仅仅是<mark>引用</mark>，而不是持有该引用的变量，对于<mark>变量</mark>来说，还是要遵循相应的作用域规则.
 变量销毁后，还是可以通过引用的地址获取到引用指向的数据的。
 
-# T: 'static
+## T: 'static
 `T: 'static` 与 `&'static` 有相同的约束：`T` 必须活得和程序一样久。
 
 static 到底针对谁？
 大家有没有想过，到底是 `&'static` 这个<mark>引用</mark>还是该<mark>引用指向的数据</mark>活得跟程序一样久呢？
 答案是引用指向的数据，而引用本身是要遵循其作用域范围的.
 
-# Reborrow 再借用
+## Reborrow 再借用
 
 ```rust
 #[derive(Debug)]
